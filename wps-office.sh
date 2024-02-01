@@ -40,6 +40,18 @@ ingredients:
     - wget $URL
   packages:
     - wps-office
+    - libc6
+    - libstdc++6
+    - libfreetype6
+    - libcups2
+    - libglib2.0-0
+    - libglu1-mesa
+    - libsm6
+    - libxrender1
+    - libfontconfig1
+    - libxext6
+    - libxcb1
+    - libbz2-1.0
     
 # From https://github.com/AppImageCommunity/pkg2appimage/blob/master/recipes/wps-office.yml
 script:
