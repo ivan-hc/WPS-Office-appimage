@@ -123,4 +123,3 @@ cp ./$APP/$APP.AppDir/usr/share/applications/*$ICONNAME* ./$APP/$APP.AppDir/ 2>/
 ARCH=x86_64 ./appimagetool -n ./$APP/$APP.AppDir
 cd ..
 mv ./tmp/*.AppImage ./WPS-Office_$VERSION-x86_64.Appimage
-chmod a+x *.AppImage
