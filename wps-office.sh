@@ -42,8 +42,8 @@ ingredients:
     - wps-office
     - libtiff-dev
     
-# From https://github.com/AppImageCommunity/pkg2appimage/blob/master/recipes/wps-office.yml
 script:
+  # From https://github.com/AppImageCommunity/pkg2appimage/blob/master/recipes/wps-office.yml
   - cp ./usr/share/applications/wps-office-prometheus.desktop ./
   - cp ./usr/share/icons/hicolor/256x256/mimetypes/wps-office2019-kprometheus.png ./
   # Patch startup script to make sure it will start normally. Make the path be relative.
@@ -89,10 +89,10 @@ export LD_LIBRARY_PATH="$HERE/usr/lib":"$HERE/usr/lib/x86_64-linux-gnu":"$HERE/l
 case $1 in
 	'')		echo -e "\n USAGE:	command [ARGUMENT]"
 			echo -e '\n Where [ARGUMENT] is one between "et" "wpp" "wps" and "wpspdf"\n';;
-	'et')		"$HERE/usr/bin/et" "$@" | cat;;
-	'wpp')		"$HERE/usr/bin/wpp" "$@" | cat;;
-	'wps')		"$HERE/usr/bin/wps" "$@" | cat;;
-	'wpspdf')	"$HERE/usr/bin/wpspdf" "$@" | cat;;
+	'et')		"$HERE/usr/bin/et" "$@";;
+	'wpp')		"$HERE/usr/bin/wpp" "$@";;
+	'wps')		"$HERE/usr/bin/wps" "$@";;
+	'wpspdf')	"$HERE/usr/bin/wpspdf" "$@";;
 esac
 EOF
 	
@@ -120,7 +120,22 @@ cp ./$APP/$APP.AppDir/usr/share/icons/hicolor/512x512/apps/*$ICONNAME* ./$APP/$A
 cp ./$APP/$APP.AppDir/usr/share/icons/hicolor/scalable/apps/*$ICONNAME* ./$APP/$APP.AppDir/ 2>/dev/null
 cp ./$APP/$APP.AppDir/usr/share/applications/*$ICONNAME* ./$APP/$APP.AppDir/ 2>/dev/null
 
+# MUI PATCH
+cp ./$APP/$APP.AppDir/opt/kingsoft/wps-office/office6/mui/lang_list/lang_list_community.json ./opt/kingsoft/wps-office/office6/mui/lang_list/lang_list_community.json.backup
+lang_list=$(wget -q https://api.github.com/repos/wachin/wps-office-all-mui-win-language/releases -O - | grep browser_download_url | grep "lang_list_community.json" | cut -d '"' -f 4 | head -1)
+wget -c $lang_list 
+cp lang_list_community.json ./$APP/$APP.AppDir/opt/kingsoft/wps-office/office6/mui/lang_list/
+dicts=$(wget -q https://api.github.com/repos/wachin/wps-office-all-mui-win-language/releases -O - | grep browser_download_url | grep "dicts.7z" | cut -d '"' -f 4 | head -1)
+wget -q $dicts
+7za x dicts.7z
+rsync -av ./dicts/* ./$APP/$APP.AppDir/opt/kingsoft/wps-office/office6/dicts/spellcheck/
+mui=$(wget -q https://api.github.com/repos/wachin/wps-office-all-mui-win-language/releases -O - | grep browser_download_url | grep "mui.7z" | cut -d '"' -f 4 | head -1)
+wget -q $mui
+7za x mui.7z
+rsync -av ./mui/* ./$APP/$APP.AppDir/opt/kingsoft/wps-office/office6/mui/
+rm -f -R ./*.7z
+
 # EXPORT THE APP TO AN APPIMAGE
 ARCH=x86_64 ./appimagetool -n ./$APP/$APP.AppDir
 cd ..
-mv ./tmp/*.AppImage ./WPS-Office_$VERSION-1-x86_64.AppImage
+mv ./tmp/*.AppImage ./WPS-Office_$VERSION-MUI-x86_64.AppImage
