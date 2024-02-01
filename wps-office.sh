@@ -40,6 +40,7 @@ ingredients:
     - wget $URL
   packages:
     - wps-office
+    - libtiff-dev
     
 # From https://github.com/AppImageCommunity/pkg2appimage/blob/master/recipes/wps-office.yml
 script:
