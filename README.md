@@ -3,7 +3,13 @@ This repository creates and distributes the unofficial Appimage of WPS Office bu
 It is compatible with GLIBC version from [Debian oldstable](https://packages.debian.org/source/oldstable/glibc) and above.
 
 ---------------------------------
+## Usage
+```
+./*AppImage [ARGUMENT] [OPTION]
+```
+Where [ARGUMENT] is one between "et", "wpp", "wps" and "wpspdf".
 
+---------------------------------
 ## Install and update it with ease
 
 I wrote two bash scripts to install and manage the applications: [AM](https://github.com/ivan-hc/AM-Application-Manager) and [AppMan](https://github.com/ivan-hc/AppMan). Their dual existence is based on the needs of the end user.
