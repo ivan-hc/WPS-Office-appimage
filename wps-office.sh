@@ -85,14 +85,22 @@ rm -R -f ./$APP/$APP.AppDir/AppRun
 cat >> ./$APP/$APP.AppDir/AppRun << 'EOF'
 #!/usr/bin/env bash
 HERE="$(dirname "$(readlink -f "${0}")")"
+export QT_FONT_DPI=96
 export LD_LIBRARY_PATH="$HERE/usr/lib":"$HERE/usr/lib/x86_64-linux-gnu":"$HERE/lib":"$HERE/lib/x86_64-linux-gnu":"$HERE/lib64":$LD_LIBRARY_PATH
 case $1 in
-	'')		echo -e "\n USAGE:	command [ARGUMENT]"
-			echo -e '\n Where [ARGUMENT] is one between "et" "wpp" "wps" and "wpspdf"\n';;
-	'et')		"$HERE/usr/bin/et" "$@";;
-	'wpp')		"$HERE/usr/bin/wpp" "$@";;
-	'wps')		"$HERE/usr/bin/wps" "$@";;
-	'wpspdf')	"$HERE/usr/bin/wpspdf" "$@";;
+	'')
+		"$HERE/opt/kingsoft/wps-office/office6/wpsoffice";;		
+	'et')
+		"$HERE/usr/bin/et" "$@";;
+	'wpp')
+		"$HERE/usr/bin/wpp" "$@";;
+	'wps')
+		"$HERE/usr/bin/wps" "$@";;
+	'wpspdf')
+		"$HERE/usr/bin/wpspdf" "$@";;
+	'help'|'-h'|'--help')
+		echo -e "\n USAGE:	command [ARGUMENT]"
+		echo -e '\n Where [ARGUMENT] is one between "et" "wpp" "wps" and "wpspdf"\n';;
 esac
 EOF
 	
