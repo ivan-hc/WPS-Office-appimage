@@ -89,20 +89,29 @@ export QT_FONT_DPI=96
 export LD_LIBRARY_PATH="$HERE/usr/lib":"$HERE/usr/lib/x86_64-linux-gnu":"$HERE/lib":"$HERE/lib/x86_64-linux-gnu":"$HERE/lib64":$LD_LIBRARY_PATH
 case $1 in
 	'')
-		"$HERE/opt/kingsoft/wps-office/office6/wpsoffice";;		
+		"$HERE/opt/kingsoft/wps-office/office6/wpsoffice" 2>/dev/null;;		
 	'et')
-		"$HERE/usr/bin/et" "$@";;
+		"$HERE/usr/bin/et" "$2" 2>/dev/null;;
 	'wpp')
-		"$HERE/usr/bin/wpp" "$@";;
+		"$HERE/usr/bin/wpp" "$2" 2>/dev/null;;
 	'wps')
-		"$HERE/usr/bin/wps" "$@";;
+		"$HERE/usr/bin/wps" "$2" 2>/dev/null;;
 	'wpspdf')
-		"$HERE/usr/bin/wpspdf" "$@";;
+		"$HERE/usr/bin/wpspdf" "$2" 2>/dev/null;;
 	'help'|'-h'|'--help')
-		echo -e "\n USAGE:	command [ARGUMENT]"
-		echo -e '\n Where [ARGUMENT] is one between "et" "wpp" "wps" and "wpspdf"\n';;
+		echo -e "\n USAGE:		[OPTION]"
+		echo -e "\n 		[OPTION] /path/to/document"
+		echo -e "\n OPTIONS:	-h,--help	Show this message"
+		echo -e "\n 		-v,--version	Show the version"
+		echo -e "\n 		et		Open WPS Spreadsheets"
+		echo -e "\n 		wpp		Open WPS Presentation"
+		echo -e "\n 		wps		Open WPS Writer"
+		echo -e "\n 		wpspdf		Open WPS PDF\n";;
+	'-v'|'--version')
+		echo "WPS Office vVREPLACE";;
 esac
 EOF
+sed -i "s/VREPLACE/$VERSION/g" ./$APP/$APP.AppDir/AppRun
 	
 # MADE THE APPRUN EXECUTABLE
 chmod a+x ./$APP/$APP.AppDir/AppRun
@@ -146,4 +155,4 @@ rm -f -R ./*.7z
 # EXPORT THE APP TO AN APPIMAGE
 ARCH=x86_64 ./appimagetool -n ./$APP/$APP.AppDir
 cd ..
-mv ./tmp/*.AppImage ./WPS-Office_$VERSION-MUI-x86_64.AppImage
+mv ./tmp/*.AppImage ./WPS-Office_$VERSION-x86_64.AppImage
