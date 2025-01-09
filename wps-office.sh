@@ -153,6 +153,8 @@ rsync -av ./mui/* ./$APP/$APP.AppDir/opt/kingsoft/wps-office/office6/mui/
 rm -f -R ./*.7z
 
 # EXPORT THE APP TO AN APPIMAGE
-ARCH=x86_64 ./appimagetool --comp zstd --mksquashfs-opt -Xcompression-level --mksquashfs-opt 20 ./$APP/$APP.AppDir
+ARCH=x86_64 ./appimagetool --comp zstd --mksquashfs-opt -Xcompression-level --mksquashfs-opt 20 \
+	-u "gh-releases-zsync|$GITHUB_REPOSITORY_OWNER|WPS-Office-appimage|continuous|*x86_64.AppImage.zsync" \
+	./"$APP".AppDir WPS-Office_"$VERSION"-x86_64.AppImage
 cd ..
-mv ./tmp/*.AppImage ./WPS-Office_$VERSION-x86_64.AppImage
+mv ./tmp/*.AppImage* ./
