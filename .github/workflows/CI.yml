@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v3
 
@@ -18,7 +18,6 @@ jobs:
       if: always()
       run: |
         sudo apt update && sudo apt install libfuse2 desktop-file-utils
-        wget https://raw.githubusercontent.com/ivan-hc/Wps-office-appimage/main/wps-office.sh
         chmod a+x ./wps-office.sh
         ./wps-office.sh
         mkdir dist
