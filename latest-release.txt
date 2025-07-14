@@ -1,2 +1,2 @@
 https://github.com/ivan-hc/WPS-Office-appimage/releases/download/continuous/WPS-Office_11.1.0.11723-x86_64.AppImage
-Sun Jul 13 01:02:53 UTC 2025
+Mon Jul 14 01:00:14 UTC 2025
