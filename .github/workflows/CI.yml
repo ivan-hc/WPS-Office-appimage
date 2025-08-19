@@ -17,7 +17,7 @@ jobs:
     - name: build
       if: always()
       run: |
-        sudo apt update && sudo apt install libfuse2 desktop-file-utils
+        sudo apt update && sudo apt install libfuse2 desktop-file-utils appstream
         chmod a+x ./wps-office.sh
         ./wps-office.sh
         mkdir dist
