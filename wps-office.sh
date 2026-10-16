@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 APP=wps-office
-VERSION=$(wget -q https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=wps-office -O - | grep "pkgver=" | head -1 | cut -c 8-)
 
 # CREATE A TEMPORARY DIRECTORY
 mkdir -p tmp
@@ -12,13 +11,13 @@ if test -f ./appimagetool; then
 	echo " appimagetool already exists" 1> /dev/null
 else
 	echo " Downloading appimagetool..."
-	wget -q https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage -O appimagetool
+	wget -q https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage -O appimagetool || exit 1
 fi
 if test -f ./pkg2appimage; then
 	echo " pkg2appimage already exists" 1> /dev/null
 else
 	echo " Downloading pkg2appimage..."
-	wget -q "$(curl -Ls https://api.github.com/repos/AppImageCommunity/pkg2appimage/releases/latest | sed 's/[()",{} ]/\n/g' | grep -io "http.*x86_64.*appimage$" | head -1)" -O pkg2appimage
+	wget -q "$(curl -Ls https://api.github.com/repos/AppImageCommunity/pkg2appimage/releases/latest | sed 's/[()",{} ]/\n/g' | grep -io "http.*x86_64.*appimage$" | head -1)" -O pkg2appimage || exit 1
 fi
 chmod a+x ./appimagetool ./pkg2appimage
 rm -f ./recipe.yml
@@ -36,8 +35,8 @@ ingredients:
     - deb http://security.debian.org/debian-security/ oldstable-security main contrib non-free
     - deb http://ftp.debian.org/debian/ oldstable-updates main contrib non-free
   script:
-    - URL=$(wget -q https://aur.archlinux.org/packages/wps-office -O - | grep -Eo "(http|https)://[a-zA-Z0-9./?=_%:-]*" | grep -i "amd64.deb" | head -1)
-    - wget $URL
+    - URL="https://wdl1.pcfg.cache.wpscdn.com/wpsdl/wpsoffice/download/linux/wps-office.deb"
+    - [ ! -f ./wps-office.deb ] && wget $URL
   packages:
     - wps-office
     - libtiff-dev
@@ -71,19 +70,23 @@ script:
 EOF
 
 # DOWNLOAD ALL THE NEEDED PACKAGES AND COMPILE THE APPDIR
-./pkg2appimage ./recipe.yml
+./pkg2appimage --appimage-extract-and-run ./recipe.yml
 
-# LIBUNIONPRELOAD
-#wget https://github.com/project-portable/libunionpreload/releases/download/amd64/libunionpreload.so
-#chmod a+x libunionpreload.so
-#mv ./libunionpreload.so ./$APP/$APP.AppDir/
+# VERSION
+if [ -f ./"$APP"/wps-office.deb ]; then
+	ar x "$APP"/wps-office.deb && tar xf ./control.tar.* && rm -f ./control.tar.* ./data.tar.* || exit 1
+	wait
+	VERSION=$(grep Version 0<control | cut -c 10-)
+else
+	VERSION="test"
+fi
 
 # COMPILE SCHEMAS
-glib-compile-schemas ./$APP/$APP.AppDir/usr/share/glib-2.0/schemas/ || echo "No ./usr/share/glib-2.0/schemas/"
+glib-compile-schemas ./"$APP"/"$APP".AppDir/usr/share/glib-2.0/schemas/ || echo "No ./usr/share/glib-2.0/schemas/"
 
 # CUSTOMIZE THE APPRUN
-rm -R -f ./$APP/$APP.AppDir/AppRun
-cat >> ./$APP/$APP.AppDir/AppRun << 'EOF'
+rm -f ./"$APP"/"$APP".AppDir/AppRun
+cat >> ./"$APP"/"$APP".AppDir/AppRun << 'EOF'
 #!/usr/bin/env bash
 HERE="$(dirname "$(readlink -f "${0}")")"
 export QT_FONT_DPI=96
@@ -112,50 +115,34 @@ case $1 in
 		echo "WPS Office vVREPLACE";;
 esac
 EOF
-sed -i "s/VREPLACE/$VERSION/g" ./$APP/$APP.AppDir/AppRun
+sed -i "s/VREPLACE/$VERSION/g" ./"$APP"/"$APP".AppDir/AppRun
 	
 # MADE THE APPRUN EXECUTABLE
-chmod a+x ./$APP/$APP.AppDir/AppRun
+chmod a+x ./"$APP"/"$APP".AppDir/AppRun
 # END OF THE PART RELATED TO THE APPRUN, NOW WE WELL SEE IF EVERYTHING WORKS ----------------------------------------------------------------------
 
 # IMPORT THE LAUNCHER AND THE ICON TO THE APPDIR IF THEY NOT EXIST
-if test -f ./$APP/$APP.AppDir/*.desktop; then
+if test -f ./"$APP"/"$APP".AppDir/*.desktop; then
 	echo "The desktop file exists"
 else
 	echo "Trying to get the .desktop file"
-	cp ./$APP/$APP.AppDir/usr/share/applications/*$(ls . | grep -i $APP | cut -c -4)*desktop ./$APP/$APP.AppDir/ 2>/dev/null
+	cp ./"$APP"/"$APP".AppDir/usr/share/applications/*$(ls . | grep -i "$APP" | cut -c -4)*desktop ./"$APP"/"$APP".AppDir/ 2>/dev/null
 fi
 
-ICONNAME=$(cat ./$APP/$APP.AppDir/*desktop | grep "Icon=" | head -1 | cut -c 6-)
-cp ./$APP/$APP.AppDir/usr/share/icons/hicolor/22x22/apps/*$ICONNAME* ./$APP/$APP.AppDir/ 2>/dev/null
-cp ./$APP/$APP.AppDir/usr/share/icons/hicolor/24x24/apps/*$ICONNAME* ./$APP/$APP.AppDir/ 2>/dev/null
-cp ./$APP/$APP.AppDir/usr/share/icons/hicolor/32x32/apps/*$ICONNAME* ./$APP/$APP.AppDir/ 2>/dev/null
-cp ./$APP/$APP.AppDir/usr/share/icons/hicolor/48x48/apps/*$ICONNAME* ./$APP/$APP.AppDir/ 2>/dev/null
-cp ./$APP/$APP.AppDir/usr/share/icons/hicolor/64x64/apps/*$ICONNAME* ./$APP/$APP.AppDir/ 2>/dev/null
-cp ./$APP/$APP.AppDir/usr/share/icons/hicolor/128x128/apps/*$ICONNAME* ./$APP/$APP.AppDir/ 2>/dev/null
-cp ./$APP/$APP.AppDir/usr/share/icons/hicolor/256x256/apps/*$ICONNAME* ./$APP/$APP.AppDir/ 2>/dev/null
-cp ./$APP/$APP.AppDir/usr/share/icons/hicolor/512x512/apps/*$ICONNAME* ./$APP/$APP.AppDir/ 2>/dev/null
-cp ./$APP/$APP.AppDir/usr/share/icons/hicolor/scalable/apps/*$ICONNAME* ./$APP/$APP.AppDir/ 2>/dev/null
-cp ./$APP/$APP.AppDir/usr/share/applications/*$ICONNAME* ./$APP/$APP.AppDir/ 2>/dev/null
-
-# MUI PATCH
-cp ./$APP/$APP.AppDir/opt/kingsoft/wps-office/office6/mui/lang_list/lang_list_community.json ./opt/kingsoft/wps-office/office6/mui/lang_list/lang_list_community.json.backup
-lang_list=$(wget -q https://api.github.com/repos/wachin/wps-office-all-mui-win-language/releases -O - | grep browser_download_url | grep "lang_list_community.json" | cut -d '"' -f 4 | head -1)
-wget -c $lang_list 
-cp lang_list_community.json ./$APP/$APP.AppDir/opt/kingsoft/wps-office/office6/mui/lang_list/
-dicts=$(wget -q https://api.github.com/repos/wachin/wps-office-all-mui-win-language/releases -O - | grep browser_download_url | grep "dicts.7z" | cut -d '"' -f 4 | head -1)
-wget -q $dicts
-7za x dicts.7z
-rsync -av ./dicts/* ./$APP/$APP.AppDir/opt/kingsoft/wps-office/office6/dicts/spellcheck/
-mui=$(wget -q https://api.github.com/repos/wachin/wps-office-all-mui-win-language/releases -O - | grep browser_download_url | grep "mui.7z" | cut -d '"' -f 4 | head -1)
-wget -q $mui
-7za x mui.7z
-rsync -av ./mui/* ./$APP/$APP.AppDir/opt/kingsoft/wps-office/office6/mui/
-rm -f -R ./*.7z
+ICONNAME=$(cat ./"$APP"/"$APP".AppDir/*desktop | grep "Icon=" | head -1 | cut -c 6-)
+cp ./"$APP"/"$APP".AppDir/usr/share/icons/hicolor/22x22/apps/*$ICONNAME* ./"$APP"/"$APP".AppDir/ 2>/dev/null
+cp ./"$APP"/"$APP".AppDir/usr/share/icons/hicolor/24x24/apps/*$ICONNAME* ./"$APP"/"$APP".AppDir/ 2>/dev/null
+cp ./"$APP"/"$APP".AppDir/usr/share/icons/hicolor/32x32/apps/*$ICONNAME* ./"$APP"/"$APP".AppDir/ 2>/dev/null
+cp ./"$APP"/"$APP".AppDir/usr/share/icons/hicolor/48x48/apps/*$ICONNAME* ./"$APP"/"$APP".AppDir/ 2>/dev/null
+cp ./"$APP"/"$APP".AppDir/usr/share/icons/hicolor/64x64/apps/*$ICONNAME* ./"$APP"/"$APP".AppDir/ 2>/dev/null
+cp ./"$APP"/"$APP".AppDir/usr/share/icons/hicolor/128x128/apps/*$ICONNAME* ./"$APP"/"$APP".AppDir/ 2>/dev/null
+cp ./"$APP"/"$APP".AppDir/usr/share/icons/hicolor/256x256/apps/*$ICONNAME* ./"$APP"/"$APP".AppDir/ 2>/dev/null
+cp ./"$APP"/"$APP".AppDir/usr/share/icons/hicolor/512x512/apps/*$ICONNAME* ./"$APP"/"$APP".AppDir/ 2>/dev/null
+cp ./"$APP"/"$APP".AppDir/usr/share/icons/hicolor/scalable/apps/*$ICONNAME* ./"$APP"/"$APP".AppDir/ 2>/dev/null
+cp ./"$APP"/"$APP".AppDir/usr/share/applications/*$ICONNAME* ./"$APP"/"$APP".AppDir/ 2>/dev/null
 
 # EXPORT THE APP TO AN APPIMAGE
-ARCH=x86_64 ./appimagetool --comp zstd --mksquashfs-opt -Xcompression-level --mksquashfs-opt 20 \
-	-u "gh-releases-zsync|$GITHUB_REPOSITORY_OWNER|WPS-Office-appimage|continuous|*x86_64.AppImage.zsync" \
+ARCH=x86_64 ./appimagetool -u "gh-releases-zsync|$GITHUB_REPOSITORY_OWNER|WPS-Office-appimage|continuous|*x86_64.AppImage.zsync" \
 	./"$APP"/"$APP".AppDir WPS-Office_"$VERSION"-x86_64.AppImage
 cd ..
 mv ./tmp/*.AppImage* ./
