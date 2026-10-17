@@ -87,30 +87,30 @@ glib-compile-schemas ./"$APP"/"$APP".AppDir/usr/share/glib-2.0/schemas/ || echo 
 # CUSTOMIZE THE APPRUN
 rm -f ./"$APP"/"$APP".AppDir/AppRun
 cat >> ./"$APP"/"$APP".AppDir/AppRun << 'EOF'
-#!/usr/bin/env bash
+#!/bin/sh
 HERE="$(dirname "$(readlink -f "${0}")")"
 export QT_FONT_DPI=96
 export LD_LIBRARY_PATH="$HERE/usr/lib":"$HERE/usr/lib/x86_64-linux-gnu":"$HERE/lib":"$HERE/lib/x86_64-linux-gnu":"$HERE/lib64":$LD_LIBRARY_PATH
 case $1 in
 	'')
-		"$HERE/opt/kingsoft/wps-office/office6/wpsoffice" 2>/dev/null;;		
+		"$HERE/opt/kingsoft/wps-office/office6/wpsoffice";;		
 	'et')
-		"$HERE/usr/bin/et" "$2" 2>/dev/null;;
+		"$HERE/usr/bin/et" "$2";;
 	'wpp')
-		"$HERE/usr/bin/wpp" "$2" 2>/dev/null;;
+		"$HERE/usr/bin/wpp" "$2";;
 	'wps')
-		"$HERE/usr/bin/wps" "$2" 2>/dev/null;;
+		"$HERE/usr/bin/wps" "$2";;
 	'wpspdf')
-		"$HERE/usr/bin/wpspdf" "$2" 2>/dev/null;;
+		"$HERE/usr/bin/wpspdf" "$2";;
 	'help'|'-h'|'--help')
-		echo -e "\n USAGE:		[OPTION]"
-		echo -e "\n 		[OPTION] /path/to/document"
-		echo -e "\n OPTIONS:	-h,--help	Show this message"
-		echo -e "\n 		-v,--version	Show the version"
-		echo -e "\n 		et		Open WPS Spreadsheets"
-		echo -e "\n 		wpp		Open WPS Presentation"
-		echo -e "\n 		wps		Open WPS Writer"
-		echo -e "\n 		wpspdf		Open WPS PDF\n";;
+		printf "\n USAGE:		[OPTION]"
+		printf "\n 		[OPTION] /path/to/document"
+		printf "\n OPTIONS:	-h,--help	Show this message"
+		printf "\n 		-v,--version	Show the version"
+		printf "\n 		et		Open WPS Spreadsheets"
+		printf "\n 		wpp		Open WPS Presentation"
+		printf "\n 		wps		Open WPS Writer"
+		printf "\n 		wpspdf		Open WPS PDF\n";;
 	'-v'|'--version')
 		echo "WPS Office vVREPLACE";;
 esac
