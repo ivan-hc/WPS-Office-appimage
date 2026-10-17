@@ -95,13 +95,13 @@ case $1 in
 	'')
 		"$HERE/opt/kingsoft/wps-office/office6/wpsoffice";;		
 	'et')
-		"$HERE/usr/bin/et" "$2";;
+		"$HERE/opt/kingsoft/wps-office/office6/et" "$2";;
 	'wpp')
-		"$HERE/usr/bin/wpp" "$2";;
+		"$HERE/opt/kingsoft/wps-office/office6/wpp" "$2";;
 	'wps')
-		"$HERE/usr/bin/wps" "$2";;
+		"$HERE/opt/kingsoft/wps-office/office6/wps" "$2";;
 	'wpspdf')
-		"$HERE/usr/bin/wpspdf" "$2";;
+		"$HERE/opt/kingsoft/wps-office/office6/wpspdf" "$2";;
 	'help'|'-h'|'--help')
 		printf "\n USAGE:		[OPTION]"
 		printf "\n 		[OPTION] /path/to/document"
